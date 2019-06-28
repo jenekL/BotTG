@@ -3,6 +3,7 @@ const Scene = require('telegraf/scenes/base');
 const {enter, leave} = Stage;
 const {Markup} = require('telegraf');
 const keyboards = require('../../utils/keyboards');
+const contains = require('./../../utils/arrayContains');
 
 
 let availableRemindList = [];
@@ -25,28 +26,34 @@ addRemindScene.enter(async (ctx) => {
 });
 
 addRemindScene.hears('Назад', async (ctx) => {
-    console.log('add back');
     leave();
     await ctx.scene.enter('reminderScene');
 });
 
 //addRemindScene.hears('Назад',leave());
 
-
 addRemindScene.on('text', async (ctx) => {
-    if (availableRemindList.contains(ctx.message.text)) {
+    if (contains(availableRemindList, 'text', ctx.message.text)) {
         //add remind
-        remindsList.push(ctx.message.text);
-        availableRemindList.splice(availableRemindList.indexOf(ctx.message.text), 1);
+
+        let index = -1;
+        const val = availableRemindList.find((item, i) => {
+            if (item.text === ctx.message.text) {
+                index = i;
+                return item;
+            }
+        });
+
+        remindsList.push(val);
+
+        availableRemindList.splice(index, 1);
+
+        await ctx.scene.enter('reminderScene');
     }
-   // leave();
-    await ctx.scene.enter('reminderScene');
+    // leave();
 });
 
 addRemindScene.leave(async (ctx) => {
-    console.log('add scene leave');
-    // const {remindsKeyboard} = keyboards.getRemindsKeyboard(ctx);
-    // await ctx.reply('Выберите действие.', remindsKeyboard);
 });
 
 

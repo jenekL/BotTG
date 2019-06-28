@@ -13,16 +13,13 @@ const remindListAll = [];
 //TODO from db
 function setRemindsList() {
     //from db
+    remindListAll.push({text: 'При приглашении к оператору', description: 'Вызов при приглашении к оператору'});
+    remindListAll.push({text: '60 минут', description: 'Оповещение за 60 минут до вызова'});
+    remindListAll.push({text: '30 минут', description: 'Оповещение за 30 минут до вызова'});
+    remindListAll.push({text: '15 минут', description: 'Оповещение за 15 минут до вызова'});
+    remindListAll.push({text: '10 минут', description: 'Оповещение за 10 минут до вызова'});
 
-
-    remindListAll.push('При приглашении к оператору');
-    remindListAll.push('60 минут');
-    remindListAll.push('30 минут');
-    remindListAll.push('15 минут');
-    remindListAll.push('10 минут');
-
-    remindsList.push('10');
-    // remindsList.push('30');
+    remindsList.push({text: '10 минут', description: 'Оповещение за 10 минут до вызова'});
 }
 
 reminderScene.enter(async (ctx) => {
@@ -41,23 +38,39 @@ reminderScene.hears('Добавить', async (ctx) => {
 
 reminderScene.hears('Удалить', async (ctx) => {
     ctx.scene.enter('delRemindScene');
-    console.log('del');
 });
 
 reminderScene.hears(/Просмотреть/, async (ctx) => {
-    console.log('watch');
-    let list = '';
-    for (let i = 0; i < remindsList.length; i++) {
-        list += (remindsList[i] + '\n');
+
+    let list = await getList(remindsList);
+
+    if (list === '') {
+        await ctx.reply('Напоминания отсутствуют.');
+    } else {
+        await ctx.reply('Ваши напоминания:\n' + list, Markup.inlineKeyboard([
+                Markup.callbackButton('Подробнее', 'details')
+            ]).resize().extra()
+        );
     }
-    await ctx.reply('Ваши напоминания:\n' + list, Markup.inlineKeyboard([
-        Markup.callbackButton('Подробности', 'details')
-        ]).resize().extra()
-    );
 });
 
+function getList(remindsList) {
+    let list = '';
+    for (let i = 0; i < remindsList.length; i++) {
+        list += (remindsList[i]['text'] + '\n');
+    }
+    return list;
+}
+
+function getDescriptionList(remindsList) {
+    let list = '';
+    for (let i = 0; i < remindsList.length; i++) {
+        list += (remindsList[i].text + ':\n' + remindsList[i].description + '\n');
+    }
+    return list;
+}
+
 reminderScene.leave(async (ctx) => {
-    console.log('scene remind leave');
 });
 
 reminderScene.hears('Назад', async (ctx) => {
@@ -66,11 +79,29 @@ reminderScene.hears('Назад', async (ctx) => {
     await ctx.reply('Что узнать:', mainKeyboard);
 });
 
-//TODO details
-reminderScene.action('details', async (ctx) =>{
-    console.log(ctx.callbackQuery.inline_message_id);
-    await ctx.telegram.editMessageText(ctx.chat.id,ctx.callbackQuery.message_id,
-        ctx.callbackQuery.message_id, 'edited');
+
+reminderScene.action('details', async (ctx) => {
+
+    let list = getDescriptionList(remindsList);
+
+    await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
+        undefined, 'Ваши напоминания:\n' + list, Markup.inlineKeyboard([
+            Markup.callbackButton('Кратко', 'short')
+        ]).resize().extra()
+    );
+
+});
+
+reminderScene.action('short', async (ctx) => {
+
+    let list = getList(remindsList);
+
+    await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
+        undefined, 'Ваши напоминания:\n' + list, Markup.inlineKeyboard([
+            Markup.callbackButton('Подробнее', 'details')
+        ]).resize().extra()
+    );
+
 });
 
 

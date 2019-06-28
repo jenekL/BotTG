@@ -6,10 +6,10 @@ const keyboards = require('../../utils/keyboards');
 
 const talonScene = new Scene('talonScene');
 
-//TODO realise
+
 talonScene.enter(async (ctx) => {
     const {talonKeyboard} = keyboards.getTalonKeyboard(ctx);
-    await ctx.reply('ЧТо сделать.', talonKeyboard);
+    await ctx.reply('?', talonKeyboard);
 });
 
 talonScene.leave();
@@ -21,18 +21,24 @@ talonScene.hears('Назад', async (ctx) => {
 });
 
 
-talonScene.hears('Начать', async (ctx) => {
+talonScene.hears(/Начать/, async (ctx) => {
     const beginKeyboard = Markup.keyboard([
         ['Продолжить отслеживание существующего талона'],
-        ['Отслеживать новый талон']
+        ['Отслеживать новый талон'],
+        ['Вернуться']
     ])
         .resize()
         .extra();
     await ctx.reply('Что узнать:', beginKeyboard);
 });
 
+talonScene.hears('Вернуться', async (ctx) =>{
+    const {talonKeyboard} = keyboards.getTalonKeyboard(ctx);
+    await ctx.reply('?', talonKeyboard);
+});
+
 //отправить на сервер запрос с завершением
-talonScene.hears('Завершить', (ctx) => {
+talonScene.hears(/Завершить/, (ctx) => {
 
 });
 

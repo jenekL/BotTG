@@ -3,6 +3,7 @@ const Scene = require('telegraf/scenes/base');
 const {enter, leave} = Stage;
 const {Markup} = require('telegraf');
 const keyboards = require('../../utils/keyboards');
+const contains = require('./../../utils/arrayContains');
 
 let delRemindList = [];
 let remindsList = require('./reminds').remindsList;
@@ -12,7 +13,7 @@ const delRemindScene = new Scene('delRemindScene');
 function setDelRemindList() {
     console.log('del back');
     delRemindList = remindsList;
-    remindsList.push('Назад');
+    delRemindList.push('Назад');
 }
 
 delRemindScene.enter((ctx) => {
@@ -25,12 +26,23 @@ delRemindScene.hears('Назад', async (ctx) => {
     await ctx.scene.enter('reminderScene');
 });
 
+
 delRemindScene.on('text', async (ctx) => {
-    if (delRemindList.contains(ctx.message.text)) {
-        remindsList.splice(remindsList.indexOf(ctx.message.text), 1);
+    if (contains(delRemindList, 'text', ctx.message.text)) {
+
+        let index = -1;
+        const val = remindsList.find((item, i) => {
+            if (item.text === ctx.message.text) {
+                index = i;
+                return i;
+            }
+        });
+
+        remindsList.splice(index, 1);
+
+        await ctx.scene.enter('reminderScene');
     }
     //leave();
-    await ctx.scene.enter('reminderScene');
 });
 
 delRemindScene.leave(async (ctx) => {

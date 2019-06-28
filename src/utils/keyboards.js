@@ -31,8 +31,7 @@ const getMainKeyboard = (ctx) => {
     let mainKeyboard = Markup.keyboard([
         [mainKeyboardTalon],
         [mainKeyboardPosition],
-        [mainKeyboardReminds],
-        [mainKeyboardAnother]
+        [mainKeyboardReminds]
     ]);
     mainKeyboard = mainKeyboard.resize().extra();
 
@@ -41,13 +40,12 @@ const getMainKeyboard = (ctx) => {
         mainKeyboardTalon,
         mainKeyboardPosition,
         mainKeyboardReminds,
-        mainKeyboardAnother
     };
 };
 
 const getTalonKeyboard = (ctx) => {
-    const talonKeyboardStart = 'Начать';
-    const talonKeyboardFinish = 'Завершить';
+    const talonKeyboardStart = 'Начать отслеживание';
+    const talonKeyboardFinish = 'Завершить отслеживание';
     const talonKeyboardBack = 'Назад';
 
     let talonKeyboard = Markup.keyboard([

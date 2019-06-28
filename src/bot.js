@@ -2,30 +2,23 @@
 const Telegraf = require('telegraf');
 const session = require('telegraf/session');
 const Stage = require('telegraf/stage');
-const Scene = require('telegraf/scenes/base');
-const WizardScene = require('telegraf/scenes/wizard');
+//const Scene = require('telegraf/scenes/base');
 const {enter, leave} = Stage;
 const asyncWrapper = require('./utils/asyncWrapper');
-const arrayContsins = require('./utils/arrayContains');
 const keyboards = require('./utils/keyboards');
-
+require('./utils/arrayContains');
+const XMLparseString = require('xml2js').parseString;
 const WebSocket = require('ws');
-let ws;
 
 // Устанавливаем токен, который выдавал нам бот.
-const token = '797482196:AAHpZnnt4TmXo_394dik-HJ259jz5cFRuCE';
+const TOKEN = '797482196:AAHpZnnt4TmXo_394dik-HJ259jz5cFRuCE';
+const RECONNECTION_TIME = 60 * 1000; // 60 sec
 
-
-const mainScene = require('./controller/main/mainScene');
+const startScene = require('./controller/start/startScene');
 const reminderScene = require('./controller/reminds/reminds');
 const addRemindScene = require('./controller/reminds/addReminds');
 const delRemindScene = require('./controller/reminds/deleteRemindScene');
 const talonScene = require('./controller/talon/talon');
-
-//TODO to separate file
-Array.prototype.contains = function (element) {
-    return this.indexOf(element) > -1;
-};
 
 
 /*const create = new WizardScene(
@@ -63,6 +56,7 @@ const stage = new Stage();
 stage.register(create);
 */
 
+let ws;
 const connect = async () => {
     ws = new WebSocket('ws://localhost:8081');
     ws.on('open', async () => {
@@ -73,39 +67,62 @@ const connect = async () => {
     });
     ws.on('close', async () => {
         console.log('connection closed');
-        setTimeout(connect, 60000); //6 secs
+        setTimeout(connect, RECONNECTION_TIME);
     });
-    //TODO xml parse
+
     ws.onmessage = async response => {
-        const params = JSON.parse(response.data);
-        await params.forEach((param) => {
-            bot.telegram.sendMessage(param.userId, param.infoText);
+        const params = XMLparseString(response.data, (err, result) => {
+            if (result !== undefined) {
+                console.dir(result);
+                console.dir(result.root);
+            } else {
+                console.dir(err);
+            }
+
         });
+
+        // const params = JSON.parse(response.data);
+        // await params.forEach((param) => {
+        //     bot.telegram.sendMessage(param.userId, param.infoText);
+        // });
     };
 };
 
 //TODO Переменные окружения
-const bot = new Telegraf(token);
+const bot = new Telegraf(TOKEN);
 
 //bot.use(Telegraf.log());
 
 const stage = new Stage(
-    [addRemindScene.addRemindScene, mainScene.mainScene,
-        reminderScene.reminderScene, delRemindScene.delRemindScene, talonScene],
+    [addRemindScene.addRemindScene, reminderScene.reminderScene, delRemindScene.delRemindScene, talonScene, startScene],
     {ttl: 10});
 bot.use(session());
 bot.use(stage.middleware());
 
 bot.start(asyncWrapper(async (ctx) => {
-    console.log("start ID:", ctx.from.first_name + " ", ctx.from.id);
-    //ctx.scene.enter('mainScene');
-    const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
-    await ctx.reply('Что узнать:', mainKeyboard);
+    let payload = ctx.startPayload;
+    if(payload !== ''){
+        console.log('start ID:', ctx.from.first_name + ' ', ctx.from.id, ' payload:' + payload);
+        //проверка на валидность пейлоада
+        if(payload === '123'){
+            ctx.reply('Талон не существует.');
+            ctx.scene.enter('startScene');
+        }
+        else{
+            ctx.reply('Добро пожаловать!');
+            const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
+            await ctx.reply('Что узнать:', mainKeyboard);
+        }
+    }
+    else{
+        console.log('start without payload ID:', ctx.from.first_name + ' ', ctx.from.id, ' payload:' + payload);
+        ctx.scene.enter('startScene');
+    }
 }));
 
 bot.hears('Талон', asyncWrapper(async (ctx) => await ctx.scene.enter('talonScene')));
 
-bot.hears('Напоминания', asyncWrapper( async (ctx) => {
+bot.hears('Напоминания', asyncWrapper(async (ctx) => {
     ctx.scene.enter('reminderScene')
 }));
 
@@ -118,21 +135,17 @@ bot.hears('Назад', asyncWrapper(async (ctx) => {
     await ctx.reply('Что узнать:', mainKeyboard);
 }));
 
-bot.hears('Another', (ctx) => {
+bot.hears('Another', async (ctx) => {
     console.log(ctx.from.id + ' ' + ctx.from.first_name);
-    ctx.reply('123');
-    ctx.reply('4');
-    ctx.reply('5');
-    ctx.reply('6');
+    await ctx.reply('123');
+    await ctx.reply('4');
+    await ctx.reply('5');
+    await ctx.reply('6');
 });
 
 bot.help((ctx) => {
     ctx.reply('Попробуйте написать /start ;)')
 });
-
-
-//@Deprecate
-//bot.on('message', (ctx => ctx.reply(ctx.message.text)));
 
 //bot.startPolling();
 connect();
