@@ -3,21 +3,16 @@ const Scene = require('telegraf/scenes/base');
 const {enter, leave} = Stage;
 const {Markup} = require('telegraf');
 const keyboards = require('../../utils/keyboards');
-
+const asyncWrapper = require('./../../utils/asyncWrapper');
+const getRemindsList = require('./../../utils/reminds');
 
 const reminderScene = new Scene('reminderScene');
 
 const remindsList = [];
-const remindListAll = [];
+let remindListAll = [];
 
-//TODO from db
 function setRemindsList() {
-    //from db
-    remindListAll.push({text: 'При приглашении к оператору', description: 'Вызов при приглашении к оператору'});
-    remindListAll.push({text: '60 минут', description: 'Оповещение за 60 минут до вызова'});
-    remindListAll.push({text: '30 минут', description: 'Оповещение за 30 минут до вызова'});
-    remindListAll.push({text: '15 минут', description: 'Оповещение за 15 минут до вызова'});
-    remindListAll.push({text: '10 минут', description: 'Оповещение за 10 минут до вызова'});
+    Array.prototype.push.apply(remindListAll, getRemindsList());
 
     remindsList.push({text: '10 минут', description: 'Оповещение за 10 минут до вызова'});
 }
@@ -30,15 +25,13 @@ reminderScene.enter(async (ctx) => {
     await ctx.reply('Выберите действие.', remindsKeyboard);
 });
 
-//TODO инфа откуда-то, список инфы только нужной
-reminderScene.hears('Добавить', async (ctx) => {
+reminderScene.hears('Добавить', asyncWrapper(async (ctx) => {
     ctx.scene.enter('addRemindScene');
-    console.log('add');
-});
+}));
 
-reminderScene.hears('Удалить', async (ctx) => {
+reminderScene.hears('Удалить', asyncWrapper(async (ctx) => {
     ctx.scene.enter('delRemindScene');
-});
+}));
 
 reminderScene.hears(/Просмотреть/, async (ctx) => {
 
@@ -79,9 +72,7 @@ reminderScene.hears('Назад', async (ctx) => {
     await ctx.reply('Что узнать:', mainKeyboard);
 });
 
-
 reminderScene.action('details', async (ctx) => {
-
     let list = getDescriptionList(remindsList);
 
     await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
@@ -89,11 +80,9 @@ reminderScene.action('details', async (ctx) => {
             Markup.callbackButton('Кратко', 'short')
         ]).resize().extra()
     );
-
 });
 
 reminderScene.action('short', async (ctx) => {
-
     let list = getList(remindsList);
 
     await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
@@ -101,8 +90,6 @@ reminderScene.action('short', async (ctx) => {
             Markup.callbackButton('Подробнее', 'details')
         ]).resize().extra()
     );
-
 });
-
 
 module.exports = {reminderScene, remindsList, remindListAll};

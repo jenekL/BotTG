@@ -12,9 +12,13 @@ let remindListAll = require('./reminds').remindListAll;
 
 function setAvailableRemindList() {
     availableRemindList = [];
-    availableRemindList = remindListAll.filter(function (value) {
-        return !remindsList.contains(value);
-    });
+    for(item of remindListAll){
+        if(!contains(remindsList, 'text', item.text)){
+            availableRemindList.push(item);
+
+        }
+    }
+
     availableRemindList.push('Назад');
 }
 

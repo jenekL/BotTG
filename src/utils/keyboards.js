@@ -25,7 +25,7 @@ const getRemindsKeyboard = (ctx) => {
 
 const getMainKeyboard = (ctx) => {
     const mainKeyboardTalon = 'Талон';
-    const mainKeyboardPosition = 'Позиция';
+    const mainKeyboardPosition = 'Обновить информацию';
     const mainKeyboardReminds = 'Напоминания';
     const mainKeyboardAnother = 'Another';
     let mainKeyboard = Markup.keyboard([
@@ -44,8 +44,8 @@ const getMainKeyboard = (ctx) => {
 };
 
 const getTalonKeyboard = (ctx) => {
-    const talonKeyboardStart = 'Начать отслеживание';
-    const talonKeyboardFinish = 'Завершить отслеживание';
+    const talonKeyboardStart = 'Начать';
+    const talonKeyboardFinish = 'Завершить';
     const talonKeyboardBack = 'Назад';
 
     let talonKeyboard = Markup.keyboard([

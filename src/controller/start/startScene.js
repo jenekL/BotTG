@@ -4,6 +4,7 @@ const Stage = require('telegraf/stage');
 const {enter, leave} = Stage;
 const {Markup} = require('telegraf');
 const keyboards = require('../../utils/keyboards');
+const database = require('../../database/database');
 
 
 const startScene = new Scene('startScene');
@@ -13,14 +14,21 @@ startScene.enter(async (ctx)=>{
 });
 
 startScene.on('message', async (ctx)=>{
+    ctx.reply(ctx.message.text);
+    //TODO проверка
     if(ctx.message.text === '123'){
-        ctx.reply('Такого талона нет, попробуйте еще раз!');
+        //ctx.reply('Готово!');
+        database.addUser({
+            id: ctx.from.id,
+            sourceName: 'telegram',
+            talonID: Number(ctx.message.text)
+        });
+        const {mainKeyboard} = await keyboards.getMainKeyboard(ctx);
+        await ctx.reply('Что узнать:', mainKeyboard);
+        await ctx.scene.leave();
     }
     else{
-        ctx.reply('Готово!');
-        const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
-        await ctx.reply('Что узнать:', mainKeyboard);
-        ctx.scene.leave();
+        ctx.reply('Такого талона нет, попробуйте еще раз!');
     }
 });
 
