@@ -1,4 +1,4 @@
-'use strict';
+const {match} = require('telegraf-i18n');
 const Scene = require('telegraf/scenes/base');
 const Stage = require('telegraf/stage');
 const {enter, leave} = Stage;
@@ -10,7 +10,7 @@ const database = require('../../database/database');
 const startScene = new Scene('startScene');
 
 startScene.enter(async (ctx)=>{
-    ctx.reply('Введите номер талона:', Markup.removeKeyboard().extra());
+    ctx.reply(ctx.i18n.t('scenes.start.newTalon'), Markup.removeKeyboard().extra());
 });
 
 startScene.on('message', async (ctx)=>{
@@ -24,11 +24,11 @@ startScene.on('message', async (ctx)=>{
             talonID: Number(ctx.message.text)
         });
         const {mainKeyboard} = await keyboards.getMainKeyboard(ctx);
-        await ctx.reply('Что узнать:', mainKeyboard);
+        await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
         await ctx.scene.leave();
     }
     else{
-        ctx.reply('Такого талона нет, попробуйте еще раз!');
+        ctx.reply(ctx.i18n.t('scenes.start.talonNotExist'));
     }
 });
 

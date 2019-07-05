@@ -1,10 +1,10 @@
 const {Markup} = require('telegraf');
 
 const getRemindsKeyboard = (ctx) => {
-    const remindsKeyboardAll = 'Просмотреть активные';
-    const remindsKeyboardAdd = 'Добавить';
-    const remindsKeyboardDel = 'Удалить';
-    const remindsKeyboardBack = 'Назад';
+    const remindsKeyboardAll = ctx.i18n.t('keyboards.reminds.all');
+    const remindsKeyboardAdd = ctx.i18n.t('keyboards.reminds.add');
+    const remindsKeyboardDel = ctx.i18n.t('keyboards.reminds.del');
+    const remindsKeyboardBack = ctx.i18n.t('keyboards.backButton');
     let remindsKeyboard = Markup.keyboard([
         [remindsKeyboardAll],
         [remindsKeyboardAdd],
@@ -24,14 +24,15 @@ const getRemindsKeyboard = (ctx) => {
 };
 
 const getMainKeyboard = (ctx) => {
-    const mainKeyboardTalon = 'Талон';
-    const mainKeyboardPosition = 'Обновить информацию';
-    const mainKeyboardReminds = 'Напоминания';
-    const mainKeyboardAnother = 'Another';
+    const mainKeyboardTalon = ctx.i18n.t('keyboards.main.talon');
+    const mainKeyboardPosition = ctx.i18n.t('keyboards.main.updateInfo');
+    const mainKeyboardReminds = ctx.i18n.t('keyboards.main.reminds');
+    const mainKeyboardSettings = ctx.i18n.t('keyboards.main.settings');
     let mainKeyboard = Markup.keyboard([
         [mainKeyboardTalon],
         [mainKeyboardPosition],
-        [mainKeyboardReminds]
+        [mainKeyboardReminds],
+        [mainKeyboardSettings]
     ]);
     mainKeyboard = mainKeyboard.resize().extra();
 
@@ -40,13 +41,14 @@ const getMainKeyboard = (ctx) => {
         mainKeyboardTalon,
         mainKeyboardPosition,
         mainKeyboardReminds,
+        mainKeyboardSettings
     };
 };
 
 const getTalonKeyboard = (ctx) => {
-    const talonKeyboardStart = 'Начать';
-    const talonKeyboardFinish = 'Завершить';
-    const talonKeyboardBack = 'Назад';
+    const talonKeyboardStart = ctx.i18n.t('keyboards.talon.begin');
+    const talonKeyboardFinish = ctx.i18n.t('keyboards.talon.end');
+    const talonKeyboardBack = ctx.i18n.t('keyboards.backButton');
 
     let talonKeyboard = Markup.keyboard([
         [talonKeyboardStart],
@@ -63,5 +65,36 @@ const getTalonKeyboard = (ctx) => {
     };
 };
 
-module.exports = {getMainKeyboard, getRemindsKeyboard, getTalonKeyboard};
+const getSettingsKeyboard = (ctx) => {
+    const settingsKeyboardLanguage = ctx.i18n.t('keyboards.settings.language');
+
+    let settingsKeyboard = Markup.keyboard([
+        settingsKeyboardLanguage
+    ]);
+    settingsKeyboard = settingsKeyboard.resize().extra();
+
+    return {
+        settingsKeyboard,
+        settingsKeyboardLanguage
+    };
+};
+
+const getLanguageSelectKeyboard = (ctx) => {
+    const ru = 'Русский';
+    const eng = 'English';
+    const ukr = 'Українська';
+
+    let languageKeyboard = Markup.inlineKeyboard([
+        Markup.callbackButton(ru, 'ruL'),
+        Markup.callbackButton(ukr, 'ukrL'),
+        Markup.callbackButton(eng, 'engL')
+    ]);
+    languageKeyboard = languageKeyboard.extra();
+
+    return {
+        languageKeyboard,
+    };
+};
+
+module.exports = {getMainKeyboard, getRemindsKeyboard, getTalonKeyboard, getSettingsKeyboard, getLanguageSelectKeyboard};
 

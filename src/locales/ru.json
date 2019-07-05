@@ -1,0 +1,40 @@
+{
+  "scenes": {
+    "start": {
+      "newTalon": "Введите номер талона:",
+      "talonNotExist": "Такого талона нет! Попробуйте еще раз."
+    },
+    "reminds": {
+    },
+    "talon": {
+    },
+    "main": {
+      "question": "Что узнать?"
+    },
+    "settings": {
+      "question": "Что изменить?",
+      "languageSelect": "Выберите язык:"
+    }
+  },
+  "keyboards": {
+    "backButton": "Назад",
+    "settings": {
+      "language": "Изменить язык"
+    },
+    "main": {
+      "talon": "Талон",
+      "reminds": "Напоминания",
+      "settings": "Настройки",
+      "updateInfo": "Обновить информацию"
+    },
+    "talon": {
+      "begin": "Начать",
+      "end": "Завершить"
+    },
+    "reminds": {
+      "all": "Просмотреть активные",
+      "add": "Добавить",
+      "del": "Удалить"
+    }
+  }
+}
