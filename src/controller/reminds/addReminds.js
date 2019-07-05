@@ -4,37 +4,34 @@ const {enter, leave} = Stage;
 const {Markup} = require('telegraf');
 const keyboards = require('../../utils/keyboards');
 const contains = require('./../../utils/arrayContains');
+const {match} = require('telegraf-i18n');
 
 
 let availableRemindList = [];
 let remindsList = require('./reminds').remindsList;
 let remindListAll = require('./reminds').remindListAll;
 
-function setAvailableRemindList() {
+function setAvailableRemindList(ctx) {
     availableRemindList = [];
     for(item of remindListAll){
         if(!contains(remindsList, 'text', item.text)){
             availableRemindList.push(item);
-
         }
     }
-
-    availableRemindList.push('Назад');
+    availableRemindList.push(ctx.i18n.t('keyboards.backButton'));
 }
 
 const addRemindScene = new Scene('addRemindScene');
 
 addRemindScene.enter(async (ctx) => {
-    setAvailableRemindList();
-    ctx.reply(ctx.from.first_name + ', выберите услугу', Markup.keyboard(availableRemindList).extra());
+    setAvailableRemindList(ctx);
+    ctx.reply(ctx.from.first_name + ctx.i18n.t('scenes.reminds.chooseOption'), Markup.keyboard(availableRemindList).extra());
 });
 
-addRemindScene.hears('Назад', async (ctx) => {
+addRemindScene.hears(match('keyboards.backButton'), async (ctx) => {
     leave();
     await ctx.scene.enter('reminderScene');
 });
-
-//addRemindScene.hears('Назад',leave());
 
 addRemindScene.on('text', async (ctx) => {
     if (contains(availableRemindList, 'text', ctx.message.text)) {

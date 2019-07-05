@@ -23,16 +23,22 @@ settingScene.leave(async(ctx)=>{
     await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
 });
 
-settingScene.action('ruL', (ctx) => {
+settingScene.action('ruL', async (ctx) => {
     ctx.i18n.locale('ru');
+    await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
+        undefined, ctx.i18n.t('scenes.settings.langSelect'));
     ctx.scene.leave();
 });
-settingScene.action('engL', (ctx) => {
+settingScene.action('engL', async (ctx) => {
     ctx.i18n.locale('en');
+    await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
+        undefined, ctx.i18n.t('scenes.settings.langSelect'));
     ctx.scene.leave();
 });
-settingScene.action('ukrL', (ctx) => {
+settingScene.action('ukrL', async (ctx) => {
     ctx.i18n.locale('ukr');
+    await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
+        undefined, ctx.i18n.t('scenes.settings.langSelect'));
     ctx.scene.leave();
 });
 

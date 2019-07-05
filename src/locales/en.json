@@ -1,40 +1,60 @@
 {
+  "help": {
+    "text": "Try to /start :)",
+    "randomInput": "Select options from menu!"
+  },
   "scenes": {
     "start": {
-      "newTalon": "Введите номер талона:",
-      "talonNotExist": "Такого талона нет! Попробуйте еще раз."
+      "newTalon": "Input token number:",
+      "talonNotExist": "Token is now valid! Try again:",
+      "notExistPayload": "Token is not valid!",
+      "welcome": "WELCOME!"
     },
     "reminds": {
+      "question": "Select option:",
+      "chooseOption": ", select service",
+      "short": "Short",
+      "details": "Details",
+      "yourReminds": "Your reminders",
+      "noReminds": "No reminders"
     },
     "talon": {
+      "question": "Select option:"
+
     },
     "main": {
-      "question": "Что узнать?"
+      "question": "What to know?"
     },
     "settings": {
-      "question": "Что изменить?",
-      "languageSelect": "Выберите язык:"
+      "question": "What to change?",
+      "languageSelect": "Select language:",
+      "langSelect": "Selected english language"
     }
   },
   "keyboards": {
-    "backButton": "Назад",
+    "backButton": "Back",
     "settings": {
-      "language": "Изменить язык"
+      "language": "Change language"
     },
     "main": {
-      "talon": "Талон",
-      "reminds": "Напоминания",
-      "settings": "Настройки",
-      "updateInfo": "Обновить информацию"
+      "talon": "Token",
+      "reminds": "Reminders",
+      "settings": "Settings",
+      "updateInfo": "Update information"
     },
     "talon": {
-      "begin": "Начать",
-      "end": "Завершить"
+      "begin": "Begin",
+      "end": "End"
+    },
+    "newTalon": {
+      "back": "Go back",
+      "new": "Track new token",
+      "exist": "Continue tracking exist token"
     },
     "reminds": {
-      "all": "Active",
-      "add": "Добавить",
-      "del": "Удалить"
+      "all": "Show all",
+      "add": "Add reminder",
+      "del": "Delete reminder"
     }
   }
 }

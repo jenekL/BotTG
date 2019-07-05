@@ -5,55 +5,56 @@ const {Markup} = require('telegraf');
 const keyboards = require('../../utils/keyboards');
 const {delUserByID, addUser, getTalonByID} = require('../../database/database');
 const talonScene = new Scene('talonScene');
+const {match} = require('telegraf-i18n');
 
 let newTalon = false;
 
 talonScene.enter(async (ctx) => {
     const {talonKeyboard} = keyboards.getTalonKeyboard(ctx);
-    await ctx.reply('Выберите действие: ', talonKeyboard);
+    await ctx.reply(ctx.i18n.t('scenes.talon.question'), talonKeyboard);
 });
 
 talonScene.leave();
 
-talonScene.hears('Назад', async (ctx) => {
+talonScene.hears(match('keyboards.backButton'), async (ctx) => {
     ctx.scene.leave();
     const {mainKeyboard} = await keyboards.getMainKeyboard(ctx);
-    await ctx.reply('Что узнать:', mainKeyboard);
+    await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
 });
 
 
-talonScene.hears(/Начать/, async (ctx) => {
+talonScene.hears(match('keyboards.talon.begin'), async (ctx) => {
     const beginKeyboard = Markup.keyboard([
-        ['Продолжить отслеживание существующего талона(????)'],
-        ['Отслеживать новый талон'],
-        ['Вернуться']
+        [ctx.i18n.t('keyboards.newTalon.exist')],
+        [ctx.i18n.t('keyboards.newTalon.new')],
+        [ctx.i18n.t('keyboards.newTalon.back')]
     ])
         .resize()
         .extra();
-    await ctx.reply('Что узнать:', beginKeyboard);
+    await ctx.reply(ctx.i18n.t('scenes.talon.question'), beginKeyboard);
 });
 
-talonScene.hears('Вернуться', async (ctx) =>{
+talonScene.hears(match('keyboards.newTalon.back'), async (ctx) =>{
     newTalon = false;
     const {talonKeyboard} = keyboards.getTalonKeyboard(ctx);
-    await ctx.reply('Выберите действие: ', talonKeyboard);
+    await ctx.reply(ctx.i18n.t('scenes.talon.question'), talonKeyboard);
 });
 
 //отправить на сервер запрос с завершением
-talonScene.hears(/Завершить/, async (ctx) => {
+talonScene.hears(match('keyboards.talon.end'), async (ctx) => {
     delUserByID(ctx.from.id);
     await ctx.scene.enter('startScene');
 });
 
 // продолжить шото
-talonScene.hears('Продолжить отслеживание существующего талона', (ctx) => {
+talonScene.hears(match('keyboards.newTalon.exist'), (ctx) => {
 
 });
 
 //регистрация нового талоно(отдельная функция скорее всего)
-talonScene.hears('Отслеживать новый талон', (ctx) => {
+talonScene.hears(match('keyboards.newTalon.new'), (ctx) => {
     newTalon = true;
-    ctx.reply('Введите номер талона');
+    ctx.reply(ctx.i18n.t('scenes.start.newTalon'));
 });
 
 talonScene.on('message', async (ctx)=>{

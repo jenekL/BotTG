@@ -4,24 +4,24 @@ const {enter, leave} = Stage;
 const {Markup} = require('telegraf');
 const keyboards = require('../../utils/keyboards');
 const contains = require('./../../utils/arrayContains');
+const {match} = require('telegraf-i18n');
 
 let delRemindList = [];
 let remindsList = require('./reminds').remindsList;
 
 const delRemindScene = new Scene('delRemindScene');
 
-function setDelRemindList() {
-    console.log('del back');
+function setDelRemindList(ctx) {
     delRemindList = remindsList;
-    delRemindList.push('Назад');
+    delRemindList.push(ctx.i18n.t('keyboards.backButton'));
 }
 
 delRemindScene.enter((ctx) => {
-    setDelRemindList();
-    ctx.reply(ctx.from.first_name + ', выберите услугу', Markup.keyboard(delRemindList).extra());
+    setDelRemindList(ctx);
+    ctx.reply(ctx.from.first_name + ctx.i18n.t('scenes.reminds.chooseOption'), Markup.keyboard(delRemindList).extra());
 });
 
-delRemindScene.hears('Назад', async (ctx) => {
+delRemindScene.hears(match('keyboards.backButton'), async (ctx) => {
     leave();
     await ctx.scene.enter('reminderScene');
 });

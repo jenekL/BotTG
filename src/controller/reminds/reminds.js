@@ -5,6 +5,7 @@ const {Markup} = require('telegraf');
 const keyboards = require('../../utils/keyboards');
 const asyncWrapper = require('./../../utils/asyncWrapper');
 const getRemindsList = require('./../../utils/reminds');
+const {match} = require('telegraf-i18n');
 
 const reminderScene = new Scene('reminderScene');
 
@@ -22,26 +23,26 @@ reminderScene.enter(async (ctx) => {
         setRemindsList();
     }
     const {remindsKeyboard} = keyboards.getRemindsKeyboard(ctx);
-    await ctx.reply('Выберите действие.', remindsKeyboard);
+    await ctx.reply(ctx.i18n.t('scenes.reminds.question'), remindsKeyboard);
 });
 
-reminderScene.hears('Добавить', asyncWrapper(async (ctx) => {
+reminderScene.hears(match('keyboards.reminds.add'), asyncWrapper(async (ctx) => {
     ctx.scene.enter('addRemindScene');
 }));
 
-reminderScene.hears('Удалить', asyncWrapper(async (ctx) => {
+reminderScene.hears(match('keyboards.reminds.del'), asyncWrapper(async (ctx) => {
     ctx.scene.enter('delRemindScene');
 }));
 
-reminderScene.hears(/Просмотреть/, async (ctx) => {
+reminderScene.hears(match('keyboards.reminds.all'), async (ctx) => {
 
-    let list = await getList(remindsList);
+    let list = getList(remindsList);
 
     if (list === '') {
-        await ctx.reply('Напоминания отсутствуют.');
+        await ctx.reply(ctx.i18n.t('scenes.reminds.noReminds'));
     } else {
-        await ctx.reply('Ваши напоминания:\n' + list, Markup.inlineKeyboard([
-                Markup.callbackButton('Подробнее', 'details')
+        await ctx.reply(ctx.i18n.t('scenes.reminds.yourReminds') + '\n' + list, Markup.inlineKeyboard([
+                Markup.callbackButton(ctx.i18n.t('scenes.reminds.details'), 'details')
             ]).resize().extra()
         );
     }
@@ -66,18 +67,18 @@ function getDescriptionList(remindsList) {
 reminderScene.leave(async (ctx) => {
 });
 
-reminderScene.hears('Назад', async (ctx) => {
+reminderScene.hears(match('keyboards.backButton'), async (ctx) => {
     leave();
     const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
-    await ctx.reply('Что узнать:', mainKeyboard);
+    await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
 });
 
 reminderScene.action('details', async (ctx) => {
     let list = getDescriptionList(remindsList);
 
     await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
-        undefined, 'Ваши напоминания:\n' + list, Markup.inlineKeyboard([
-            Markup.callbackButton('Кратко', 'short')
+        undefined, ctx.i18n.t('scenes.reminds.yourReminds') + '\n' + list, Markup.inlineKeyboard([
+            Markup.callbackButton(ctx.i18n.t('scenes.reminds.short'), 'short')
         ]).resize().extra()
     );
 });
@@ -86,8 +87,8 @@ reminderScene.action('short', async (ctx) => {
     let list = getList(remindsList);
 
     await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
-        undefined, 'Ваши напоминания:\n' + list, Markup.inlineKeyboard([
-            Markup.callbackButton('Подробнее', 'details')
+        undefined, ctx.i18n.t('scenes.reminds.yourReminds') + '\n' + list, Markup.inlineKeyboard([
+            Markup.callbackButton(ctx.i18n.t('scenes.reminds.details'), 'details')
         ]).resize().extra()
     );
 });

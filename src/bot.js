@@ -27,8 +27,8 @@ const settingScene = require('./controller/settings/settingScene');
 
 let ws;
 const connect = async () => {
-    ws = new WebSocket('ws://94.250.252.210:64666');
-    //ws = new WebSocket('ws://localhost:3000');
+    //ws = new WebSocket('ws://94.250.252.210:64666');
+    ws = new WebSocket('ws://localhost:3000');
     ws.on('open', async () => {
         ws.send('<request_type><row request_type="bot_reg" id="TelegClientBot"/></request_type>');
         console.log('connection opened');
@@ -88,10 +88,10 @@ bot.start(asyncWrapper(async (ctx) => {
         console.log('start ID:', ctx.from.first_name + ' ', ctx.from.id, ' payload:' + payload);
         //проверка на валидность пейлоада
         if (payload !== '123' && payload !== '456') {
-            ctx.reply('Талон не существует.');
+            ctx.reply(ctx.i18n.t('scenes.start.notExistPayload'));
             ctx.scene.enter('startScene');
         } else {
-            ctx.reply('Добро пожаловать!');
+            ctx.reply(ctx.i18n.t('scenes.start.welcome'));
 
             database.addUser({
                 id: ctx.from.id,
@@ -100,7 +100,7 @@ bot.start(asyncWrapper(async (ctx) => {
             });
 
             const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
-            await ctx.reply('Что узнать:', mainKeyboard);
+            await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
         }
     } else { // если написано /start
         console.log('start without payload ID:', ctx.from.first_name + ' ', ctx.from.id, ' payload:' + payload);
@@ -108,13 +108,13 @@ bot.start(asyncWrapper(async (ctx) => {
     }
 }));
 
-bot.hears('Талон', asyncWrapper(async (ctx) => await ctx.scene.enter('talonScene')));
+bot.hears(match('keyboards.main.talon'), asyncWrapper(async (ctx) => await ctx.scene.enter('talonScene')));
 
-bot.hears('Напоминания', asyncWrapper(async (ctx) => {
+bot.hears(match('keyboards.main.reminds'), asyncWrapper(async (ctx) => {
     ctx.scene.enter('reminderScene');
 }));
 
-bot.hears('Обновить информацию', (ctx) => {
+bot.hears(match('keyboards.main.updateInfo'), (ctx) => {
     ctx.reply('Ваша позиция: ' + 1 + '\nПримерное время ожидания: ' + 1);
 });
 
@@ -122,18 +122,18 @@ bot.hears(match('keyboards.main.settings'), asyncWrapper(async (ctx) => {
     ctx.scene.enter('settingScene');
 }));
 
-bot.hears('Назад', asyncWrapper(async (ctx) => {
+bot.hears(match('keyboards.backButton'), asyncWrapper(async (ctx) => {
     const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
-    await ctx.reply('Что узнать:', mainKeyboard);
+    await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
 }));
 
 bot.help((ctx) => {
-    ctx.reply('Попробуйте написать /start ;)')
+    ctx.reply(ctx.i18n.t('help.text'))
 });
 
 bot.on('message', async (ctx) => {
     const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
-    await ctx.reply('Выберите необходимое действие в меню!', mainKeyboard);
+    await ctx.reply(ctx.i18n.t('help.randomInput'), mainKeyboard);
 });
 
 //bot.startPolling();
