@@ -1,0 +1,21 @@
+{
+  "name": "BotTG",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.0.0",
+    "mysql": "^2.17.1",
+    "node-telegram-bot-api": "^0.30.0",
+    "telegraf": "^3.30.1",
+    "telegraf-i18n": "^6.5.0",
+    "ws": "^7.0.1",
+    "xml2js": "^0.4.19"
+  }
+}
