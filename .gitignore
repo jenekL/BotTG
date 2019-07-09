@@ -1,7 +1,9 @@
 src/server.js
-src/controller/reminds/addReminds.js
-src/controller/reminds/delReminds.js
-src/controller/reminds/reminds.js
+
+.idea
 
 #Dependency directory
 node_modules
+
+#dotenv
+.env
