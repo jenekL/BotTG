@@ -1,0 +1,6 @@
+$ cat .gitignore
+
+server.js
+/src/controller/reminds/addReminds.js
+/src/controller/reminds/delReminds.js
+/src/controller/reminds/reminds.js
