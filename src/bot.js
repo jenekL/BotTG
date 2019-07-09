@@ -5,7 +5,6 @@ const {match} = require('telegraf-i18n');
 const session = require('telegraf/session');
 const Stage = require('telegraf/stage');
 //const Scene = require('telegraf/scenes/base');
-const {enter, leave} = Stage;
 const asyncWrapper = require('./utils/asyncWrapper');
 const keyboards = require('./utils/keyboards');
 const path = require('path');
@@ -20,17 +19,14 @@ const RECONNECTION_TIME = 60 * 1000; // 60 sec
 
 const startScene = require('./controller/start/startScene');
 const reminderScene = require('./controller/reminds/reminders');
-const addRemindScene = require('./controller/reminds/addReminds');
-const delRemindScene = require('./controller/reminds/deleteRemindScene');
 const talonScene = require('./controller/talon/talon');
 const settingScene = require('./controller/settings/settingScene');
-
-
+const languageScene = require('./controller/start/languageScene');
 
 let ws;
 const connect = async () => {
-    ws = new WebSocket('ws://equery.cherg.net:64666');
-    //ws = new WebSocket('ws://localhost:8081');
+    //ws = new WebSocket('ws://equery.cherg.net:64666');
+    ws = new WebSocket('ws://localhost:8081');
 
     const authorizationStr = '<request_type><row request_type="bot_reg" id="TelegClientBot"/></request_type>';
 
@@ -83,23 +79,27 @@ const i18n = new TelegrafI18n({
 //bot.use(Telegraf.log());
 
 const stage = new Stage(
-    [addRemindScene.addRemindScene, reminderScene.reminderScene,
-        delRemindScene.delRemindScene, talonScene, startScene, settingScene]);
+    [reminderScene.reminderScene, talonScene, startScene, settingScene, languageScene.languageScene]);
 //{ttl: 10});
 bot.use(session());
 bot.use(i18n.middleware());
 bot.use(stage.middleware());
 
+//ctx.scene.enter('startWizardScene');
 bot.start(asyncWrapper(async (ctx) => {
+
+    database.delUserByID(ctx.from.id);
+
     let payload = ctx.startPayload;
-    if (payload !== '') {      //если написано /start код_талона
+    if (payload !== '' && payload !== undefined) {      //если написано /start код_талона
         console.log('start ID:', ctx.from.first_name + ' ', ctx.from.id, ' payload:' + payload);
         //проверка на валидность пейлоада
         if (payload !== '123' && payload !== '456') {
             ctx.reply(ctx.i18n.t('scenes.start.notExistPayload'));
-            ctx.scene.enter('startScene');
+            // ctx.scene.enter('startScene');
+            languageScene.setValid(true);
+            ctx.scene.enter('languageScene');
         } else {
-            ctx.reply(ctx.i18n.t('scenes.start.welcome'));
 
             database.addUser({
                 id: ctx.from.id,
@@ -107,12 +107,13 @@ bot.start(asyncWrapper(async (ctx) => {
                 talonID: Number(payload)
             });
 
-            const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
-            await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
+            ctx.scene.enter('languageScene');
         }
     } else { // если написано /start
         console.log('start without payload ID:', ctx.from.first_name + ' ', ctx.from.id, ' payload:' + payload);
-        ctx.scene.enter('startScene');
+        languageScene.setValid(true);
+        //ctx.scene.enter('startScene');
+        ctx.scene.enter('languageScene');
     }
 }));
 
@@ -153,6 +154,7 @@ bot.launch();
 //         port:3000
 //     }
 // }
+
 
 
 
