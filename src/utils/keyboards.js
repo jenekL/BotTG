@@ -67,15 +67,18 @@ const getTalonKeyboard = (ctx) => {
 
 const getSettingsKeyboard = (ctx) => {
     const settingsKeyboardLanguage = ctx.i18n.t('keyboards.settings.language');
+    const settingsKeyboardBack = ctx.i18n.t('keyboards.backButton');
 
     let settingsKeyboard = Markup.keyboard([
-        settingsKeyboardLanguage
+        settingsKeyboardLanguage,
+        settingsKeyboardBack
     ]);
     settingsKeyboard = settingsKeyboard.resize().extra();
 
     return {
         settingsKeyboard,
-        settingsKeyboardLanguage
+        settingsKeyboardLanguage,
+        settingsKeyboardBack
     };
 };
 

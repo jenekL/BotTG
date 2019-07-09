@@ -18,6 +18,10 @@ settingScene.hears(match('keyboards.settings.language'), async (ctx) => {
     await ctx.reply(ctx.i18n.t('scenes.settings.languageSelect'), languageKeyboard);
 });
 
+settingScene.hears(match('keyboards.backButton'), async (ctx) => {
+    ctx.scene.leave();
+});
+
 settingScene.leave(async(ctx)=>{
     const {mainKeyboard} = await keyboards.getMainKeyboard(ctx);
     await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);

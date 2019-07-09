@@ -11,11 +11,11 @@ server.on('connection', ws => {
         //     {userId: 255902751, infoText: 'Вас не вызывают'}
         //
         // ]));
-        client.send('<root>123</root>')
+       // client.send('<root>123</root>')
     });
 
     ws.on('message', message => {
-
+        console.log(message);
     });
 });
 

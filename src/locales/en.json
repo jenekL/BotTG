@@ -11,6 +11,9 @@
       "welcome": "WELCOME!"
     },
     "reminds": {
+      "yourReminder": "You have:",
+      "selectAnother": "To change reminder option select one from the list.",
+      "selected": "You selected:",
       "question": "Select option:",
       "chooseOption": ", select service",
       "short": "Short",

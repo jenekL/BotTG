@@ -13,24 +13,32 @@ require('./utils/arrayContains');
 const XMLparseString = require('xml2js').parseString;
 const WebSocket = require('ws');
 const database = require('./database/database');
+const now = require('./utils/timeConvert');
 
 const TOKEN = '797482196:AAHpZnnt4TmXo_394dik-HJ259jz5cFRuCE';
 const RECONNECTION_TIME = 60 * 1000; // 60 sec
 
 const startScene = require('./controller/start/startScene');
-const reminderScene = require('./controller/reminds/reminds');
+const reminderScene = require('./controller/reminds/reminders');
 const addRemindScene = require('./controller/reminds/addReminds');
 const delRemindScene = require('./controller/reminds/deleteRemindScene');
 const talonScene = require('./controller/talon/talon');
 const settingScene = require('./controller/settings/settingScene');
 
 
+
 let ws;
 const connect = async () => {
-    //ws = new WebSocket('ws://94.250.252.210:64666');
-    ws = new WebSocket('ws://localhost:3000');
+    ws = new WebSocket('ws://equery.cherg.net:64666');
+    //ws = new WebSocket('ws://localhost:8081');
+
+    const authorizationStr = '<request_type><row request_type="bot_reg" id="TelegClientBot"/></request_type>';
+
     ws.on('open', async () => {
-        ws.send('<request_type><row request_type="bot_reg" id="TelegClientBot"/></request_type>');
+        //<microtime,len,authorization>
+        ws.send('<' + now('micro') + ',' + Buffer.byteLength(authorizationStr, 'utf8')
+            + ',authorization>\n' + authorizationStr);
+
         console.log('connection opened');
     });
     ws.on('error', async () => {
