@@ -1,6 +1,7 @@
-$ cat .gitignore
+src/server.js
+src/controller/reminds/addReminds.js
+src/controller/reminds/delReminds.js
+src/controller/reminds/reminds.js
 
-server.js
-/src/controller/reminds/addReminds.js
-/src/controller/reminds/delReminds.js
-/src/controller/reminds/reminds.js
+#Dependency directory
+node_modules
