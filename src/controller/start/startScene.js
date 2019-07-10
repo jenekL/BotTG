@@ -5,7 +5,8 @@ const {enter, leave} = Stage;
 const {Markup} = require('telegraf');
 const keyboards = require('../../utils/keyboards');
 const database = require('../../database/database');
-
+const {ws} = require('./../../ws/websocket');
+const now = require('./../../utils/timeConvert');
 
 const startScene = new Scene('startScene');
 
@@ -20,9 +21,17 @@ startScene.on('message', async (ctx)=>{
         //ctx.reply('Готово!');
         database.addUser({
             id: ctx.from.id,
-            sourceName: 'telegram',
-            talonID: Number(ctx.message.text)
+            source: 'telegram',
+            coupon: Number(ctx.message.text)
         });
+
+        let data = '<request_type>' +
+            '<row request_type="TrackClient" equery_num="' + ctx.message.text + '" login="oper1" session="blahblah" />' +
+            '</request_type>';
+
+        ws.send('<' + now('micro') + ',' + Buffer.byteLength(data, 'utf8')
+            + ',add_track_client>\n' + data);
+
         const {mainKeyboard} = await keyboards.getMainKeyboard(ctx);
         await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
         await ctx.scene.leave();

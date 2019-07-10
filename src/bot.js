@@ -10,9 +10,9 @@ const keyboards = require('./utils/keyboards');
 const path = require('path');
 require('./utils/arrayContains');
 const XMLparseString = require('xml2js').parseString;
-const WebSocket = require('ws');
 const database = require('./database/database');
 const now = require('./utils/timeConvert');
+const {ws, connect} = require('./ws/websocket');
 
 const TOKEN = '797482196:AAHpZnnt4TmXo_394dik-HJ259jz5cFRuCE';
 const RECONNECTION_TIME = 60 * 1000; // 60 sec
@@ -23,48 +23,7 @@ const talonScene = require('./controller/talon/talon');
 const settingScene = require('./controller/settings/settingScene');
 const languageScene = require('./controller/start/languageScene');
 
-let ws;
-const connect = async () => {
-    //ws = new WebSocket('ws://equery.cherg.net:64666');
-    ws = new WebSocket('ws://localhost:8081');
 
-    const authorizationStr = '<request_type><row request_type="bot_reg" id="TelegClientBot"/></request_type>';
-
-    ws.on('open', async () => {
-        //<microtime,len,authorization>
-        ws.send('<' + now('micro') + ',' + Buffer.byteLength(authorizationStr, 'utf8')
-            + ',authorization>\n' + authorizationStr);
-
-        console.log('connection opened');
-    });
-    ws.on('error', async () => {
-        console.log('error connection');
-    });
-    ws.on('close', async () => {
-        console.log('connection closed');
-        setTimeout(connect, RECONNECTION_TIME);
-    });
-
-    //TODO реализовать
-    ws.onmessage = async response => {
-        console.log(response.data);
-        // const params = XMLparseString(response.data, (err, result) => {
-        //     if (result !== undefined) {
-        //         console.dir(result);
-        //         console.dir(result.root);
-        //     } else {
-        //         console.dir(err);
-        //     }
-        //
-        // });
-
-        // const params = JSON.parse(response.data);
-        // await params.forEach((param) => {
-        //     bot.telegram.sendMessage(param.userId, param.infoText);
-        // });
-    };
-
-};
 
 //TODO webhook
 const bot = new Telegraf(TOKEN);
@@ -88,7 +47,7 @@ bot.use(stage.middleware());
 //ctx.scene.enter('startWizardScene');
 bot.start(asyncWrapper(async (ctx) => {
 
-    database.delUserByID(ctx.from.id);
+    //database.delUserByID(ctx.from.id);
 
     let payload = ctx.startPayload;
     if (payload !== '' && payload !== undefined) {      //если написано /start код_талона
@@ -103,9 +62,16 @@ bot.start(asyncWrapper(async (ctx) => {
 
             database.addUser({
                 id: ctx.from.id,
-                sourceName: 'telegram',
-                talonID: Number(payload)
+                source: 'telegram',
+                coupon: Number(payload)
             });
+
+            let data = '<request_type>' +
+                '<row request_type="TrackClient" equery_num="' + payload + '" login="oper1" session="blahblah" />' +
+                '</request_type>';
+
+            ws.send('<' + now('micro') + ',' + Buffer.byteLength(data, 'utf8')
+                + ',add_track_client>\n' + data);
 
             ctx.scene.enter('languageScene');
         }
