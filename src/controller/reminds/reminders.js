@@ -6,7 +6,7 @@ const keyboards = require('../../utils/keyboards');
 const asyncWrapper = require('./../../utils/asyncWrapper');
 const getRemindsList = require('./../../utils/reminds');
 const {match} = require('telegraf-i18n');
-const contains = require('./../../utils/arrayContains');
+const {contains} = require('./../../utils/arrayContains');
 
 const reminderScene = new Scene('reminderScene');
 

@@ -13,4 +13,24 @@ function contains(array, key, text) {
     return false;
 }
 
-module.exports  = contains;
+function getFromArray(array, key, text) {
+
+    for (let i = 0; i < array.length; i++) {
+        if (array[i][0][key] === text) {
+            return array[i][0];
+        }
+    }
+    return undefined;
+}
+
+function getIndexOf(array, key, text) {
+
+    for (let i = 0; i < array.length; i++) {
+        if (array[i][0][key] === text) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+module.exports  = {contains, getFromArray, getIndexOf};
