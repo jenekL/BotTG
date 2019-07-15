@@ -13,6 +13,7 @@ const database = require('./database/database');
 const now = require('./utils/timeConvert');
 const {ws, connect} = require('./ws/websocket');
 const {addData} = require('./utils/responseHandler');
+const startWork = require('./controller/start/startFunc');
 
 const TOKEN = '797482196:AAHpZnnt4TmXo_394dik-HJ259jz5cFRuCE';
 
@@ -21,6 +22,8 @@ const reminderScene = require('./controller/reminds/reminders');
 const talonScene = require('./controller/talon/talon');
 const settingScene = require('./controller/settings/settingScene');
 const languageScene = require('./controller/start/languageScene');
+const mainScene = require('./controller/main/mainScene');
+
 
 
 //TODO webhook
@@ -36,74 +39,35 @@ const i18n = new TelegrafI18n({
 //bot.use(Telegraf.log());
 
 const stage = new Stage(
-    [reminderScene.reminderScene, talonScene, startScene, settingScene, languageScene.languageScene]);
+    [reminderScene.reminderScene, talonScene, startScene, settingScene, languageScene.languageScene, mainScene]);
 //{ttl: 10});
 bot.use(session());
 bot.use(i18n.middleware());
 bot.use(stage.middleware());
 
-//ctx.scene.enter('startWizardScene');
 bot.start(asyncWrapper(async (ctx) => {
-
-    //database.delUserByID(ctx.from.id);
-
-    let payload = ctx.startPayload;
-    if (payload !== '' && payload !== undefined && !isNaN(payload)) {      //если написано /start код_талона
-        console.log('start ID:', ctx.from.first_name + ' ', ctx.from.id, ' payload:' + payload);
-
-        const time = now('micro');
-        let data = '<request_type>' +
-            '<row request_type="TrackClient" equery_num="' + payload + '" login="oper1" session="blahblah" />' +
-            '</request_type>';
-
-        ws.send('<' + time + ',' + Buffer.byteLength(data, 'utf8')
-            + ',add_track_client>\n' + data);
-
-
-        addData([{
-                time: time,
-                coupon: payload,
-                id: ctx.from.id,
-                context: ctx,
-                payload: true
-            }]
-        );
-
-
-    } else { // если написано /start
-        console.log('start without payload ID:', ctx.from.first_name + ' ', ctx.from.id, ' payload:' + payload);
-        languageScene.setNotValid(true);
-        //ctx.scene.enter('startScene');
-        ctx.scene.enter('languageScene');
-    }
+    startWork(ctx);
 }));
 
-bot.hears(match('keyboards.main.talon'), asyncWrapper(async (ctx) => await ctx.scene.enter('talonScene')));
-
-bot.hears(match('keyboards.main.reminds'), asyncWrapper(async (ctx) => {
-    ctx.scene.enter('reminderScene');
-}));
-
-bot.hears(match('keyboards.main.updateInfo'), (ctx) => {
-    ctx.reply('Ваша позиция: ' + 1 + '\nПримерное время ожидания: ' + 1);
-});
-
-bot.hears(match('keyboards.main.settings'), asyncWrapper(async (ctx) => {
-    ctx.scene.enter('settingScene');
-}));
-
-bot.hears(match('keyboards.backButton'), asyncWrapper(async (ctx) => {
-    const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
-    await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
-}));
-
-bot.help((ctx) => {
+bot.help(async (ctx) => {
     ctx.reply(ctx.i18n.t('help.text'))
 });
 
-bot.on('message', async (ctx) => {
-    const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
-    await ctx.reply(ctx.i18n.t('help.randomInput'), mainKeyboard);
+bot.on('message',  async (ctx) => {
+
+    //not for test
+    let active = await database.getActive(ctx.from.id);
+
+    if(active){
+        ctx.scene.enter('mainScene');
+    }
+    else{
+        ctx.scene.enter('startScene');
+    }
+
+    //for test
+    //ctx.scene.enter('startScene');
+
 });
 
 //bot.startPolling();

@@ -6,6 +6,8 @@ const keyboards = require('../../utils/keyboards');
 const {delUserByID, addUser, getTalonByID} = require('../../database/database');
 const talonScene = new Scene('talonScene');
 const {match} = require('telegraf-i18n');
+const asyncWrapper = require('./../../utils/asyncWrapper');
+const startWork = require('./../start/startFunc');
 
 let newTalon = false;
 
@@ -14,14 +16,13 @@ talonScene.enter(async (ctx) => {
     await ctx.reply(ctx.i18n.t('scenes.talon.question'), talonKeyboard);
 });
 
-talonScene.leave();
+talonScene.start(asyncWrapper(async (ctx) => {
+    startWork(ctx);
+}));
 
 talonScene.hears(match('keyboards.backButton'), async (ctx) => {
-    ctx.scene.leave();
-    const {mainKeyboard} = await keyboards.getMainKeyboard(ctx);
-    await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
+    ctx.scene.enter('mainScene');
 });
-
 
 talonScene.hears(match('keyboards.talon.begin'), async (ctx) => {
     const beginKeyboard = Markup.keyboard([

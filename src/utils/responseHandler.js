@@ -14,7 +14,7 @@ function addData(elem) {
     data.push(elem);
 }
 
-function resultResponse(bot, response, time) {
+function resultResponse(response, time) {
     const dataElem = getFromArray(data, 'time', Number(time));
 
     if (dataElem !== undefined) {
@@ -35,9 +35,7 @@ function resultResponse(bot, response, time) {
                     dataElem.context.scene.enter('languageScene');
                 }
                 else{
-                    const {mainKeyboard} = keyboards.getMainKeyboard(dataElem.context);
-                    dataElem.context.reply(dataElem.context.i18n.t('scenes.main.question'), mainKeyboard);
-                    dataElem.context.scene.leave();
+                    dataElem.context.scene.enter('mainScene');
                 }
 
                 break;

@@ -19,31 +19,26 @@ settingScene.hears(match('keyboards.settings.language'), async (ctx) => {
 });
 
 settingScene.hears(match('keyboards.backButton'), async (ctx) => {
-    ctx.scene.leave();
-});
-
-settingScene.leave(async(ctx)=>{
-    const {mainKeyboard} = await keyboards.getMainKeyboard(ctx);
-    await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
+    ctx.scene.enter('mainScene');
 });
 
 settingScene.action('ruL', async (ctx) => {
     ctx.i18n.locale('ru');
     await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
         undefined, ctx.i18n.t('scenes.settings.langSelect'));
-    ctx.scene.leave();
+    ctx.scene.enter('mainScene');
 });
 settingScene.action('engL', async (ctx) => {
     ctx.i18n.locale('en');
     await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
         undefined, ctx.i18n.t('scenes.settings.langSelect'));
-    ctx.scene.leave();
+    ctx.scene.enter('mainScene');
 });
 settingScene.action('ukrL', async (ctx) => {
     ctx.i18n.locale('ukr');
     await ctx.telegram.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id,
         undefined, ctx.i18n.t('scenes.settings.langSelect'));
-    ctx.scene.leave();
+    ctx.scene.enter('mainScene');
 });
 
 module.exports = settingScene;

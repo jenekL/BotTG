@@ -31,10 +31,7 @@ async function setLang(ctx) {
         notValidToken = false;
         ctx.scene.enter('startScene');
     } else {
-        ctx.reply(ctx.i18n.t('scenes.start.welcome'));
-        const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
-        await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
-        ctx.scene.leave();
+        ctx.scene.enter('mainScene');
     }
 }
 

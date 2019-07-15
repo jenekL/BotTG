@@ -7,6 +7,7 @@ const asyncWrapper = require('./../../utils/asyncWrapper');
 const getRemindsList = require('./../../utils/reminds');
 const {match} = require('telegraf-i18n');
 const {contains} = require('./../../utils/arrayContains');
+const startWork = require('./../start/startFunc');
 
 const reminderScene = new Scene('reminderScene');
 
@@ -40,10 +41,12 @@ reminderScene.enter(async (ctx) => {
         ctx.i18n.t('scenes.reminds.selectAnother'), Markup.keyboard(availableRemindList).extra());
 });
 
+reminderScene.start(asyncWrapper(async (ctx) => {
+    startWork(ctx);
+}));
+
 reminderScene.hears(match('keyboards.backButton'), async (ctx) => {
-    ctx.scene.leave();
-    const {mainKeyboard} = keyboards.getMainKeyboard(ctx);
-    await ctx.reply(ctx.i18n.t('scenes.main.question'), mainKeyboard);
+    ctx.scene.enter('mainScene');
 });
 
 reminderScene.on('text', async (ctx) => {

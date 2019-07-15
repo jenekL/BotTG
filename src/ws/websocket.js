@@ -3,7 +3,7 @@ const now = require('./../utils/timeConvert');
 const XMLparseString = require('xml2js').parseString;
 const responseHandler = require('./../utils/responseHandler');
 
-const RECONNECTION_TIME = 60 * 1000; // 60 sec
+const RECONNECTION_TIME = 10 * 1000; // 10 sec
 
 let ws = new WebSocket('ws://localhost:8081');
 //let ws = new WebSocket('ws://equery.cherg.net:64666');
@@ -41,7 +41,7 @@ const connect = async () => {
 
                         //TODO later maybe switch
                         if (head[2] === 'add_track_client') {
-                            responseHandler.resultResponse(bot, result.response['status-code'][0], head[0]);
+                            responseHandler.resultResponse(result.response['status-code'][0], head[0]);
                         }
 
                     } else {
